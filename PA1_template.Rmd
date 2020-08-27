@@ -19,9 +19,12 @@ mydata %>%
 ```
 ## Make a histogram of the total number of steps taken each day
 ```{r}
+if (!dir.exists("./figure")) {dir.create("./figure")}
 Total<-summarise(group_by(mydata,date), Total=sum(steps))
 Total<-Total[!is.na(Total$Total),]
+png(filename = "./figure/plot1.png")
 plot(as.Date(Total$date),Total$Total,lwd=5, type="h",xlab = "Date", ylab = "Sum of steps taken")
+dev.off()
 ```
 ##Calculate and report the mean and median of the total number of steps taken per day
 ```{r}

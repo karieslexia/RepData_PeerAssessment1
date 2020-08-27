@@ -15,8 +15,12 @@ mydata %>%
   group_by(date) %>% 
   summarise(Mean = mean(steps, na.rm = TRUE),Median = median(steps, na.rm = TRUE))
 
-
+if (!dir.exists("/.figure")) {dir.create("/.figure")}
 Total<-summarise(group_by(mydata,date), Total=sum(steps))
 Total<-Total[!is.na(Total$Total),]
+png(filename = "./figure/plot1.png")
 plot(as.Date(Total$date),Total$Total,lwd=5, type="h",xlab = "Date", ylab = "Sum of steps taken")
+dev.off()
 
+?plot
+plot(mydata$interval,mean(mydata$steps,na.rm = TRUE),type = "l")
