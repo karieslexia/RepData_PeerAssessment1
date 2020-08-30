@@ -11,6 +11,7 @@ mydata %>%
   group_by(date) %>% 
   summarise(Total = sum(steps, na.rm = TRUE))
 
+
 mydata %>% 
   group_by(date) %>% 
   summarise(Mean = mean(steps, na.rm = TRUE),Median = median(steps, na.rm = TRUE))
@@ -54,3 +55,4 @@ library(lattice)
 png(filename = "./figure/plot4.png")
 xyplot(average~interval|weekday,mydata3,layout=c(1,2), ylab = "Number of steps", xlab = "Interval",type="l")
 dev.off()
+
