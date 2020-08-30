@@ -440,13 +440,48 @@ dev.off()</code></pre>
 ## 10 2012-10-10  34.4        0
 ## # ... with 51 more rows</code></pre>
 <p>#What is the average daily activity pattern? ##Make a time series plot (i.e. type = “l”) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)</p>
+<pre class="r"><code>plot2&lt;-summarise(group_by(mydata,interval), 
+                 Avgsteps=mean(steps, na.rm=TRUE)
+                 )
+png(filename = &quot;./figure/plot2.png&quot;)
+plot(plot2$interval,plot2$Avgsteps,type = &quot;l&quot;,xlab = &quot;5 minute interval&quot;, ylab = &quot;Mean of steps taken&quot;)
+dev.off()</code></pre>
+<pre><code>## png 
+##   2</code></pre>
 <p>##Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?</p>
+<pre class="r"><code>plot2$interval[plot2$Avgsteps==max(plot2$Avgsteps)]</code></pre>
+<pre><code>## [1] 835</code></pre>
 <p>#Imputing missing values ##Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)</p>
+<pre class="r"><code>sum(is.na(mydata))</code></pre>
+<pre><code>## [1] 2304</code></pre>
 <p>##Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.</p>
 <p>##Create a new dataset that is equal to the original dataset but with the missing data filled in.</p>
+<pre class="r"><code>mydata2&lt;-mydata
+mymean&lt;-mean(mydata2$steps,na.rm = TRUE)
+mydata2$steps[is.na(mydata2$steps)]&lt;- mymean</code></pre>
 <p>##Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?</p>
+<pre class="r"><code>Total2&lt;-summarise(group_by(mydata2,date), Total=sum(steps))
+png(filename = &quot;./figure/plot3.png&quot;)
+plot(as.Date(Total2$date),Total2$Total,lwd=5, type=&quot;h&quot;,xlab = &quot;Date&quot;, ylab = &quot;Sum of steps taken&quot;)
+dev.off()</code></pre>
+<pre><code>## png 
+##   2</code></pre>
 <p>#Are there differences in activity patterns between weekdays and weekends? ##Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.</p>
+<pre class="r"><code>mydata$weekday[weekdays(strptime(mydata$date,&quot;%F&quot;))==&quot;Saturday&quot;]&lt;-&quot;weekend&quot;
+mydata$weekday[weekdays(strptime(mydata$date,&quot;%F&quot;))==&quot;Sunday&quot;]&lt;-&quot;weekend&quot;
+mydata$weekday[weekdays(strptime(mydata$date,&quot;%F&quot;))!=&quot;Saturday&quot; &amp; weekdays(strptime(mydata$date,&quot;%F&quot;))!=&quot;Sunday&quot; ]&lt;-&quot;weekday&quot;
+mydata$weekday&lt;-factor(c(&quot;weekday&quot;,&quot;weekend&quot;))</code></pre>
 <p>##Make a panel plot containing a time series plot (i.e. type = “l”) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.</p>
+<pre class="r"><code>mydata3&lt;-mydata %&gt;% 
+  group_by(interval,weekday) %&gt;% 
+  summarise(average = mean(steps, na.rm = TRUE))
+
+library(lattice)
+png(filename = &quot;./figure/plot4.png&quot;)
+xyplot(average~interval|weekday,mydata3,layout=c(1,2), type=&quot;l&quot;,ylab = &quot;Number of steps&quot;, xlab = &quot;Interval&quot;)
+dev.off()</code></pre>
+<pre><code>## png 
+##   2</code></pre>
 </div>
 </div>
 

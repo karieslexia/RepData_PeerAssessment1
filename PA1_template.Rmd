@@ -36,38 +36,57 @@ mydata %>%
 #What is the average daily activity pattern?
 ##Make a time series plot (i.e. \color{red}{\verb|type = "l"|}type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
 ```{r}
-
+plot2<-summarise(group_by(mydata,interval), 
+                 Avgsteps=mean(steps, na.rm=TRUE)
+                 )
+png(filename = "./figure/plot2.png")
+plot(plot2$interval,plot2$Avgsteps,type = "l",xlab = "5 minute interval", ylab = "Mean of steps taken")
+dev.off()
 ```
 ##Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 ```{r}
-
+plot2$interval[plot2$Avgsteps==max(plot2$Avgsteps)]
 ```
 
 #Imputing missing values
 ##Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with \color{red}{\verb|NA|}NAs)
 ```{r}
-
+sum(is.na(mydata))
 ```
 ##Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
-```{r}
 
-```
 ##Create a new dataset that is equal to the original dataset but with the missing data filled in.
 ```{r}
-
+mydata2<-mydata
+mymean<-mean(mydata2$steps,na.rm = TRUE)
+mydata2$steps[is.na(mydata2$steps)]<- mymean
 ```
 ##Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 ```{r}
-
+Total2<-summarise(group_by(mydata2,date), Total=sum(steps))
+png(filename = "./figure/plot3.png")
+plot(as.Date(Total2$date),Total2$Total,lwd=5, type="h",xlab = "Date", ylab = "Sum of steps taken")
+dev.off()
 ```
 
 #Are there differences in activity patterns between weekdays and weekends?
 ##Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.
 ```{r}
-
+mydata$weekday[weekdays(strptime(mydata$date,"%F"))=="Saturday"]<-"weekend"
+mydata$weekday[weekdays(strptime(mydata$date,"%F"))=="Sunday"]<-"weekend"
+mydata$weekday[weekdays(strptime(mydata$date,"%F"))!="Saturday" & weekdays(strptime(mydata$date,"%F"))!="Sunday" ]<-"weekday"
+mydata$weekday<-factor(c("weekday","weekend"))
 ```
 ##Make a panel plot containing a time series plot (i.e. \color{red}{\verb|type = "l"|}type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
 ```{r}
 
+mydata3<-mydata %>% 
+  group_by(interval,weekday) %>% 
+  summarise(average = mean(steps, na.rm = TRUE))
+
+library(lattice)
+png(filename = "./figure/plot4.png")
+xyplot(average~interval|weekday,mydata3,layout=c(1,2), type="l",ylab = "Number of steps", xlab = "Interval")
+dev.off()
 ```
 
